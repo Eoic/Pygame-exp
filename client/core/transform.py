@@ -6,10 +6,15 @@ class Transform:
     position: Vector2
     direction: Vector2
 
-    def __init__(self):
-        self.rotation = 0
-        self.position = Vector2(0, 0)
-        self.direction = Vector2(0, 0)
+    def __init__(
+        self,
+        rotation: float = 0,
+        position: Vector2 = Vector2(0, 0),
+        direction: Vector2 = Vector2(0, 0)
+    ):
+        self.rotation = rotation
+        self.position = position
+        self.direction = direction
 
     def set_rotation(self, rotation: float) -> None:
         self.rotation = rotation

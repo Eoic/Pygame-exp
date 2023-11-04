@@ -1,35 +1,30 @@
 import uuid
-from typing import Tuple
-
 import pygame.transform
+from enum import Enum
+from typing import Tuple
+from core.world_object import WorldObject
+from pygame import Vector2, key, K_w, K_s, K_a, K_d, sprite
 
-from core.transform import Transform
-from pygame import Vector2, Surface, gfxdraw, key, K_w, K_s, K_a, K_d, sprite, image
 
+class Player(WorldObject):
+    class Direction(Enum):
+        LEFT = 'Left'
+        RIGHT = 'Right'
 
-class Player(sprite.Sprite):
     id: uuid.UUID
-    size: int
     speed: float
-    direction: Vector2
-    transform: Transform
-    color: Tuple[int, int, int]
+    facing_direction: Direction
 
     def __init__(
         self,
         group: sprite.Group,
-        color: Tuple[int, int, int] = (0, 0, 0),
-        size: int = 25,
-        speed: float = 0.0
+        speed: float = 0.0,
+        position: Vector2 = Vector2(0, 0)
     ) -> None:
-        super().__init__(group)
+        super().__init__(position=position, image_path='assets/player.png', group=group, scale=0.10)
         self.id = uuid.uuid4()
-        self.color = color
-        self.size = size
         self.speed = speed
-        self.transform = Transform()
-        self.image = pygame.transform.scale_by(image.load('assets/player.png').convert_alpha(), 0.10)
-        self.rect = self.image.get_rect()
+        self.facing_direction = self.Direction.RIGHT
 
     def handle_input(self):
         keys = key.get_pressed()
@@ -50,6 +45,7 @@ class Player(sprite.Sprite):
         if self.transform.direction.length() != 0:
             self.transform.position += self.speed * delta_time * self.transform.direction.normalize()
             self.rect.center = self.transform.position
+            self.update_facing_direction()
 
     def set_speed(self, value: float) -> None:
         if value < 0:
@@ -59,6 +55,21 @@ class Player(sprite.Sprite):
 
     def set_color(self, color: Tuple[int, int, int]):
         self.color = color
+
+    def get_facing_direction(self):
+        if self.transform.direction.x < 0 and self.facing_direction != self.Direction.LEFT:
+            return self.Direction.LEFT, True
+        elif self.transform.direction.x > 0 and self.facing_direction != self.Direction.RIGHT:
+            return self.Direction.RIGHT, True
+
+        return self.facing_direction, False
+
+    def update_facing_direction(self):
+        if self.transform.direction.x == 0:
+            return
+
+        self.facing_direction, is_flip_x_needed = self.get_facing_direction()
+        self.image = pygame.transform.flip(self.image, is_flip_x_needed, False)
 
     def __str__(self) -> str:
         return f'Player(id={self.id})'
