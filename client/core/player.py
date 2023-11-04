@@ -1,10 +1,13 @@
 import uuid
 from typing import Tuple
-from client.core import Transform
-from pygame import draw, Vector2, Surface, gfxdraw
+
+import pygame.transform
+
+from core.transform import Transform
+from pygame import Vector2, Surface, gfxdraw, key, K_w, K_s, K_a, K_d, sprite, image
 
 
-class Player:
+class Player(sprite.Sprite):
     id: uuid.UUID
     size: int
     speed: float
@@ -12,12 +15,41 @@ class Player:
     transform: Transform
     color: Tuple[int, int, int]
 
-    def __init__(self, color=(0, 0, 0), size=25, speed=0) -> None:
+    def __init__(
+        self,
+        group: sprite.Group,
+        color: Tuple[int, int, int] = (0, 0, 0),
+        size: int = 25,
+        speed: float = 0.0
+    ) -> None:
+        super().__init__(group)
         self.id = uuid.uuid4()
         self.color = color
         self.size = size
         self.speed = speed
         self.transform = Transform()
+        self.image = pygame.transform.scale_by(image.load('assets/player.png').convert_alpha(), 0.10)
+        self.rect = self.image.get_rect()
+
+    def handle_input(self):
+        keys = key.get_pressed()
+        direction = Vector2(0, 0)
+
+        if keys[K_w]:
+            direction.y = -1
+        if keys[K_s]:
+            direction.y = 1
+        if keys[K_a]:
+            direction.x = -1
+        if keys[K_d]:
+            direction.x = 1
+
+        self.transform.set_direction(direction)
+
+    def handle_update(self, delta_time: float):
+        if self.transform.direction.length() != 0:
+            self.transform.position += self.speed * delta_time * self.transform.direction.normalize()
+            self.rect.center = self.transform.position
 
     def set_speed(self, value: float) -> None:
         if value < 0:
@@ -25,19 +57,8 @@ class Player:
 
         self.speed = value
 
-    def move(self, delta_time: float):
-        if self.transform.direction.length() == 0:
-            return
-
-        self.transform.position += self.speed * delta_time * self.transform.direction.normalize()
-
     def set_color(self, color: Tuple[int, int, int]):
         self.color = color
-
-    def draw(self, screen: Surface) -> None:
-        gfxdraw.aacircle(screen, int(self.transform.position.x), int(self.transform.position.y), self.size, self.color)
-        gfxdraw.filled_circle(screen, int(self.transform.position.x), int(self.transform.position.y), self.size, self.color)
-        # draw.circle(screen, self.color, (self.transform.position.x, self.transform.position.y), self.size)
 
     def __str__(self) -> str:
         return f'Player(id={self.id})'

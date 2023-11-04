@@ -1,2 +1,3 @@
-from client.core.transform import *
-from client.core.player import *
+from core.transform import *
+from core.player import *
+from core.camera import *
