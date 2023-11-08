@@ -24,7 +24,8 @@ class Transform:
         self.notify_listeners()
 
     def set_position(self, position: Vector2) -> None:
-        self.position = position
+        self.position.x = round(position.x)
+        self.position.y = round(position.y)
         self.notify_listeners()
 
     def set_direction(self, direction: Vector2) -> None:
