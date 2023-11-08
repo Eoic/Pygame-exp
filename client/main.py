@@ -3,6 +3,12 @@ from core.player import Player
 from core.camera import CameraGroup
 from core.world_object import WorldObject
 
+# TODO:
+# * Movement interpolation (https://www.pygame.org/wiki/Interpolator): 
+#   * Camera
+#   * Character
+# * Collisions
+
 pygame.init()
 delta_time = 0
 is_running = True
@@ -11,18 +17,27 @@ screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 camera_group = CameraGroup()
 
 tree = WorldObject(
-    image_path='assets/tree.png',
     scale=0.4,
+    image_path='assets/tree.png',
     group=camera_group,
-    position=pygame.Vector2(screen.get_width() / 2 - 200, screen.get_height() / 2)
+)
+
+tree.transform.set_position(
+    pygame.Vector2(
+        screen.get_width() / 2 - 200,
+        screen.get_height() / 2,
+    )
 )
 
 player = Player(
-    group=camera_group,
     speed=440.0,
-    position=pygame.Vector2(
+    group=camera_group,
+)
+
+player.transform.set_position(
+    pygame.Vector2(
         screen.get_width() / 2 - 20,
-        screen.get_height() / 2 - 20
+        screen.get_height() / 2 - 20,
     )
 )
 

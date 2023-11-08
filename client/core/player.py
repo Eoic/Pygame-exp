@@ -21,7 +21,7 @@ class Player(WorldObject):
         speed: float = 0.0,
         position: Vector2 = Vector2(0, 0)
     ) -> None:
-        super().__init__(position=position, image_path='assets/player.png', group=group, scale=0.10)
+        super().__init__(image_path='assets/player.png', group=group, scale=0.10)
         self.id = uuid.uuid4()
         self.speed = speed
         self.facing_direction = self.Direction.RIGHT
