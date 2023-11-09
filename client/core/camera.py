@@ -1,4 +1,6 @@
+import numpy
 import pygame
+import numpy as np
 
 
 class CameraGroup(pygame.sprite.Group):
@@ -20,6 +22,10 @@ class CameraGroup(pygame.sprite.Group):
 
         self.offset.x = self.target.centerx - self.half_width
         self.offset.y = self.target.centery - self.half_height
+
+    def set_half_size(self, half_width: int, half_height: int):
+        self.half_width = half_width
+        self.half_height = half_height
 
     def custom_draw(self):
         self.center_to_target()

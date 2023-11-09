@@ -6,7 +6,7 @@ class Transform:
     rotation: float
     position: Vector2
     direction: Vector2
-    listeners: Callable[['Transform'], None]
+    listeners: list[Callable[['Transform'], None]]
 
     def __init__(
         self,
