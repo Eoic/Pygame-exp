@@ -9,7 +9,7 @@ from core.events import EventHandler
 # * Movement interpolation (https://www.pygame.org/wiki/Interpolator): 
 #   * Camera
 #   * Character
-# * Use world coordinates insstead of pixels.
+# * Use world coordinates instead of pixels.
 # * Collisions between player and static world objects.
 
 Game().run()

@@ -1,29 +1,33 @@
+from typing import Type
+from pygame.event import Event
+
+
 class EventHandler:
-    targets = {}
+    handlers = {}
+    listeners = {}
 
     @classmethod
-    def register(cls, event_type):
-        def decorator(func):
-            if hasattr(func, '__self__') and func.__self__ is not None:
-                print('Registered with self')
-                func_type = (func.__self__, event_type)
-            else:
-                print('Registered none')
-                func_type = (None, event_type)
-
-            EventHandler.targets.setdefault(func_type, []).append(func)
+    def register(cls, instance_type_id: Type, event_type: int):
+        def decorator(handler):
+            cls.handlers.setdefault(event_type, []).append((instance_type_id, handler))
+            return handler
 
         return decorator
 
     @classmethod
-    def notify(cls, event, instance):
-        # handlers = cls.targets[event.type] if event.type in EventHandler.targets else []
-        for func_type, handlers in cls.targets.items():
-            instance, event_type = func_type
-            if event_type == event.type:
-                for func in handlers:
-                    if instance is None or (event.__self__ is not None and instance == event.__self__):
-                        func(instance, event)
+    def add_listener(cls, instance_type_id, instance):
+        cls.listeners[instance_type_id] = instance
 
-        # for func in handlers:
-        #     func(event)
+    @classmethod
+    def remove_listener(cls, instance_type: Type):
+        del cls.listeners[instance_type]
+
+    @classmethod
+    def notify(cls, event: Event):
+        active_handlers = cls.handlers.get(event.type, [])
+
+        for instance_type_id, handler in active_handlers:
+            instance = cls.listeners.get(instance_type_id)
+
+            if instance is not None:
+                handler(instance, event)
