@@ -1,12 +1,10 @@
-import numpy
 import pygame
-import numpy as np
 
 
 class CameraGroup(pygame.sprite.Group):
-    target: pygame.Rect
-    surface: pygame.Surface
+    target: pygame.Vector2
     offset: pygame.Vector2
+    surface: pygame.Surface
 
     def __init__(self, target=None):
         super().__init__()
@@ -20,8 +18,8 @@ class CameraGroup(pygame.sprite.Group):
         if self.target is None:
             return
 
-        self.offset.x = self.target.centerx - self.half_width
-        self.offset.y = self.target.centery - self.half_height
+        self.offset.x = self.target.x - self.half_width
+        self.offset.y = self.target.y - self.half_height
 
     def set_half_size(self, half_width: int, half_height: int):
         self.half_width = half_width
@@ -34,5 +32,5 @@ class CameraGroup(pygame.sprite.Group):
             offset_position = sprite.rect.topleft - self.offset
             self.surface.blit(sprite.image, offset_position)
 
-    def set_target(self, target: pygame.Rect):
+    def set_target(self, target: pygame.Vector2):
         self.target = target

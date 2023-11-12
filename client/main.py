@@ -12,4 +12,4 @@ from core.events import EventHandler
 # * Use world coordinates instead of pixels.
 # * Collisions between player and static world objects.
 
-Game().run()
+Game(target_fps=144).run()

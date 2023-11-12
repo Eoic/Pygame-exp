@@ -37,10 +37,10 @@ class Game(GameId):
 
         player = Player(speed=440.0, group=self.camera)
         player.transform.set_position(pygame.Vector2(self.surface.get_width() / 2 - 20, self.surface.get_height() / 2 - 20))
-        self.camera.set_target(player.rect)
+        self.camera.set_target(pygame.Vector2(self.resolution[0] // 2, self.resolution[1] // 2))
         self.is_running = True
 
-        interpolator = Interpolator((0, 0), self.resolution, 5, 144, shape=1.2)
+        interpolator = Interpolator((0, 0), self.resolution, 5, self.target_fps, shape=1.2)
 
         while self.is_running:
             for event in pygame.event.get():
@@ -55,8 +55,8 @@ class Game(GameId):
             player.handle_input()
             player.handle_update(self.delta_time)
 
-            pygame.draw.circle(self.surface, pygame.Color(255, 128, 64), interpolator.pos, 25.0)
-            interpolator.next()
+            # pygame.draw.circle(self.surface, pygame.Color(255, 128, 64), interpolator.pos, 25.0)
+            # interpolator.next()
 
             self.camera.update()
             self.camera.custom_draw()
