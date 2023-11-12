@@ -3,6 +3,7 @@ from core.events import EventHandler
 from core.camera import CameraGroup
 from core.world_object import WorldObject
 from core.player import Player
+from core.math.interpolator import Interpolator
 
 
 class GameId:
@@ -16,6 +17,7 @@ class Game(GameId):
     surface: pygame.Surface
     target_fps: int
     camera: CameraGroup
+    resolution = (1280, 720)
 
     def __init__(self, target_fps: int = 60):
         pygame.init()
@@ -24,7 +26,7 @@ class Game(GameId):
         self.is_running = False
         self.target_fps = target_fps
         self.clock = pygame.time.Clock()
-        self.surface = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
+        self.surface = pygame.display.set_mode(self.resolution, pygame.RESIZABLE)
 
     def run(self):
         font = pygame.freetype.SysFont('Cascadia Mono', 16)
@@ -38,6 +40,8 @@ class Game(GameId):
         self.camera.set_target(player.rect)
         self.is_running = True
 
+        interpolator = Interpolator((0, 0), self.resolution, 5, 144, shape=1.2)
+
         while self.is_running:
             for event in pygame.event.get():
                 EventHandler.notify(event)
@@ -50,6 +54,9 @@ class Game(GameId):
 
             player.handle_input()
             player.handle_update(self.delta_time)
+
+            pygame.draw.circle(self.surface, pygame.Color(255, 128, 64), interpolator.pos, 25.0)
+            interpolator.next()
 
             self.camera.update()
             self.camera.custom_draw()

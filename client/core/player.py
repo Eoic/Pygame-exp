@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Tuple
 from core.world_object import WorldObject
 from pygame import Vector2, key, K_w, K_s, K_a, K_d, sprite
+from core.math.interpolator import Interpolator
 
 
 class Player(WorldObject):
@@ -43,7 +44,7 @@ class Player(WorldObject):
 
     def handle_update(self, delta_time: float):
         if self.transform.direction.length() != 0:
-            self.transform.position += self.speed * delta_time * self.transform.direction.normalize()
+            self.transform.position = self.transform.position + self.speed * delta_time * self.transform.direction.normalize()
             self.rect.center = self.transform.position
             self.update_facing_direction()
 
