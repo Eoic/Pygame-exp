@@ -8,11 +8,10 @@ from core.food_spawner import FoodSpawner
 
 class Player(WorldObject):
     id: uuid.UUID
+    size = 0
     speed: float
     direction: pygame.Vector2
-    tail: list[pygame.Rect] = []
     trail: list[pygame.Vector2] = []
-    size = 0
 
     def __init__(self, size: float, color: pygame.Color, food_spawner: FoodSpawner, speed: float = 0.0) -> None:
         super().__init__(color=color)
@@ -70,14 +69,8 @@ class Player(WorldObject):
                 self.acc_position.y = WORLD_HEIGHT - 50
 
             if self.is_food_reachable(self.food_spawner.food_position):
-                self.food_spawner.consume_food()
                 self.size += 1
-
-                if len(self.tail) == 0:
-                    self.tail.append(pygame.Rect(prev_position[0] - 25, prev_position[1] - 25, 50, 50))
-                else:
-                    last_tail_pos = self.tail[0].center
-                    self.tail.append(pygame.Rect(last_tail_pos[0] - 25, last_tail_pos[1] - 25, 50, 50))
+                self.food_spawner.spawn_food(self)
 
             if self.size > 0:
                 self.trail.append(prev_position)
