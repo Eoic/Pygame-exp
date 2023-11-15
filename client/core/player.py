@@ -11,6 +11,8 @@ class Player(WorldObject):
     speed: float
     direction: pygame.Vector2
     tail: list[pygame.Rect] = []
+    trail: list[pygame.Vector2] = []
+    size = 0
 
     def __init__(self, size: float, color: pygame.Color, food_spawner: FoodSpawner, speed: float = 0.0) -> None:
         super().__init__(color=color)
@@ -30,8 +32,7 @@ class Player(WorldObject):
         elif keys[K_s] and self.direction.y != -1:
             self.direction.x = 0
             self.direction.y = 1
-
-        if keys[K_a] and self.direction.x != 1:
+        elif keys[K_a] and self.direction.x != 1:
             self.direction.x = -1
             self.direction.y = 0
         elif keys[K_d] and self.direction.x != -1:
@@ -42,7 +43,6 @@ class Player(WorldObject):
 
     def handle_update(self, delta_time: float):
         if self.transform.direction.length() != 0:
-            prev_position = pygame.Vector2(self.transform.position.x, self.transform.position.y)
             self.acc_position = self.acc_position + self.speed * delta_time * self.transform.direction.normalize()
 
             next_position = pygame.Vector2(
@@ -50,10 +50,10 @@ class Player(WorldObject):
                 PIXELS_PER_UNIT * round(self.acc_position.y / PIXELS_PER_UNIT)
             )
 
-            # TODO: update tail items here.
-            # for index in range(1, len(self.tail)):
-            #     tail_curr = self.tail[index - 1]
-            #     tail_curr.center = [self.transform.position.x, self.transform.position.y]
+            if self.transform.position == next_position:
+                return
+
+            prev_position = pygame.Vector2(self.transform.position.x, self.transform.position.y)
 
             if next_position.x >= WORLD_WIDTH:
                 next_position.x = 50
@@ -70,19 +70,18 @@ class Player(WorldObject):
                 self.acc_position.y = WORLD_HEIGHT - 50
 
             if self.is_food_reachable(self.food_spawner.food_position):
-                pos = self.food_spawner.food_position
                 self.food_spawner.consume_food()
-                self.tail.append(pygame.Rect(pos.x - 25, pos.y - 25, 50, 50))
+                self.size += 1
 
-            if prev_position != next_position:
-                # prev_tail_pos = self.tail[0].center
+                if len(self.tail) == 0:
+                    self.tail.append(pygame.Rect(prev_position[0] - 25, prev_position[1] - 25, 50, 50))
+                else:
+                    last_tail_pos = self.tail[0].center
+                    self.tail.append(pygame.Rect(last_tail_pos[0] - 25, last_tail_pos[1] - 25, 50, 50))
 
-                if len(self.tail) > 0:
-                    for tail_idx in range(1, len(self.tail)):
-                        self.tail[tail_idx].centerx = self.tail[tail_idx - 1].centerx
-                        self.tail[tail_idx].centery = self.tail[tail_idx - 1].centery
-
-                    self.tail[0].center = [prev_position.x, prev_position.y]
+            if self.size > 0:
+                self.trail.append(prev_position)
+                self.trail = self.trail[-self.size:]
 
             self.transform.position = next_position
 
@@ -95,8 +94,8 @@ class Player(WorldObject):
     def handle_render(self, surface):
         pygame.draw.rect(surface, self.color, self.rect)
 
-        for tail_idx in range(len(self.tail)):
-            pygame.draw.rect(surface, self.color, self.tail[tail_idx])
+        for pos in self.trail:
+            pygame.draw.rect(surface, self.color, pygame.Rect(pos.x - 25, pos.y - 25, 50, 50))
 
     def set_speed(self, value: float) -> None:
         if value < 0:
