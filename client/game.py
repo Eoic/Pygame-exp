@@ -38,7 +38,7 @@ class Game(GameId):
         self.is_running = True
         food_spawner = FoodSpawner()
         food_spawner.spawn_food()
-        player = Player(speed=220.0, size=50, color=pygame.Color(64, 255, 64), food_spawner=food_spawner)
+        player = Player(speed=420.0, size=50, color=pygame.Color(64, 255, 64), food_spawner=food_spawner)
         player.transform.set_position(pygame.Vector2(
             CELL_SIZE * round(self.surface.get_width() / 2 / CELL_SIZE),
             CELL_SIZE * round(self.surface.get_height() / 2 / CELL_SIZE)
